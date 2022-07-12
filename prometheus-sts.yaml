@@ -22,14 +22,16 @@ spec:
         - containerPort: 9090
         volumeMounts:
         - name: prometheus-config-vol
-          mountPath: /etc/prometheus/prometheus.yml
-          subPath: prometheus.yml
+          mountPath: /etc/prometheus
         - name: prometheus-pv-claim
           mountPath: /prometheus
       volumes:
       - name: prometheus-config-vol
         configMap:
           name: prometheus-config
+          items:
+          - key: prometheus.yml
+            path: prometheus.yml
   volumeClaimTemplates:
   - metadata:
       name: prometheus-pv-claim
