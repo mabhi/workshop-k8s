@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: csvserver
+  name: csvserver
+  namespace: k8s-day2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csvserver
+  template:
+    metadata:
+      labels:
+        app: csvserver
+    spec:
+      containers:
+      - image: docker.io/infracloudio/csvserver:latest
+        name: csvserver
+        env:
+        - name: CSVSERVER_BORDER
+          value: "Blue"
+        ports:
+        - containerPort: 9300
+        volumeMounts:
+        - mountPath: /csvserver/inputdata
+          name: config
+          subPath: inputdata
+      volumes:
+      - name: config
+        configMap:
+          name: csvserver-input
+          items:
+          - key: inputdata-csv
+            path: inputdata

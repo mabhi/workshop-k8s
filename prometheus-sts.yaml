@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: prometheus
+  namespace: k8s-day2
+spec:
+  selector:
+    matchLabels:
+      app: prometheus # has to match .spec.template.metadata.labels
+  serviceName: "prometheus"
+  replicas: 1 # by default is 1
+  # minReadySeconds: 10 # by default is 0
+  template:
+    metadata:
+      labels:
+        app: prometheus # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+      - name: prometheus
+        image: docker.io/prom/prometheus:v2.36.2
+        ports:
+        - containerPort: 9090
+        volumeMounts:
+        - name: prometheus-config-vol
+          mountPath: /etc/prometheus/prometheus.yml
+          subPath: prometheus.yml
+        - name: prometheus-pv-claim
+          mountPath: /prometheus
+      volumes:
+      - name: prometheus-config-vol
+        configMap:
+          name: prometheus-config
+  volumeClaimTemplates:
+  - metadata:
+      name: prometheus-pv-claim
+    spec:
+      storageClassName: standard
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
